@@ -30,7 +30,6 @@ services:
       python3 manage.py makemigrations &&
       python3 manage.py migrate &&
       python3 manage.py collectstatic --noinput &&
-      python3 manage.py compilemessages &&
       gunicorn -k uvicorn.workers.UvicornWorker --workers=${WORKERS} cms.asgi:application -b 0.0.0.0:8010"
     networks:
       - russpass-backend
@@ -65,7 +64,6 @@ services:
       - .env
     restart: always
     networks:
-      - pgadmin-network
       - russpass-backend
 
   # celery_worker:
@@ -113,7 +111,4 @@ services:
       - russpass-backend
   
 networks:
-  pgadmin-network:
-    name: pgadmin-network
-    external: true
   russpass-backend:

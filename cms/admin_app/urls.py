@@ -2,9 +2,9 @@ from django.urls import path
 
 from admin_app import views as vws
 
-app_name = 'survey_app'
+app_name = 'admin_app'
 
 # Публичное API
-endpoints = [
-    path('load/', vws.StartSurveyAPIView.as_view(), name='start_survey'),
+urlpatterns = [
+    path('load/', vws.PostAPIView.as_view(), name='post_view'),
 ]

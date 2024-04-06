@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     'wagtail',
     "wagtail_modeladmin",
 
+    'rest_framework',
+
     'modelcluster',
     'taggit',
     "admin_app",
@@ -145,6 +147,12 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        # Any other authentication classes
+    ]
+}
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
@@ -153,3 +161,4 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 WAGTAIL_SITE_NAME = "RUSSPASS"
 WAGTAILADMIN_BASE_URL = 'http://127.0.0.1:8010'
 CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:2222"]
+CSRF_COOKIE_HTTPONLY = False

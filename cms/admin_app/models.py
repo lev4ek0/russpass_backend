@@ -33,12 +33,22 @@ class Tag(models.Model):
 class Photo(models.Model):
     image = models.ImageField(
         upload_to='%Y/%m/%d/',
-        verbose_name=_('image')
+        verbose_name=_('image'),
     )
     embeding = VectorField(dimensions=512, blank=False)
 
-    tags = models.ManyToManyField(Tag, related_name='photos')
+    height = models.IntegerField(null=True, blank=True)
+    width = models.IntegerField(null=True, blank=True)
+    extention = models.CharField(null=True, blank=True, max_length=10, verbose_name=_('photo_extension'))
+
+    tags = models.ManyToManyField(Tag, related_name='photos', null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.height = self.image.height
+        self.width = self.image.width
+        self.extention = self.image.name.split(".")[-1]
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return f"Photo({self.id}, {self.image.name})"
+        return f"Photo({self.id}, {self.image})"
     
