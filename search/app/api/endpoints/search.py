@@ -13,10 +13,10 @@ from sqlalchemy.orm import selectinload
 router = APIRouter()
 
 
-@router.get("")
-async def get_similar(
+@router.post("/photo")
+async def search_by_photo(
     session: Session,
-    file: UploadFile | None = None,
+    file: UploadFile,
 ) -> Page[PhotoSchema]:
     try:
         with tempfile.NamedTemporaryFile(delete=True) as temp_file:
@@ -26,13 +26,25 @@ async def get_similar(
             client = TritonClient('tritonserver:8000', '/app/bpe.model')
 
             res = client.inference_image(temp_file_path)
-            print(res.shape)
-            stmt = select(Photo).order_by(Photo.c.embeding.l2_distance(res)).limit(100)
+            stmt = select(Photo).order_by(Photo.c.embeding.l2_distance(res)).limit(50)
 
             result = await session.execute(stmt)
             items = result.all()
     finally:
         file.file.close()
+    return paginate(items)
 
-    # res = client.inference_image("1.jpg")
+
+@router.get("/text")
+async def search_by_text(
+    session: Session,
+    text: str,
+) -> Page[PhotoSchema]:
+    client = TritonClient('tritonserver:8000', '/app/bpe.model')
+
+    res = client.inference_text(text)
+    stmt = select(Photo).order_by(Photo.c.embeding.l2_distance(res)).limit(50)
+
+    result = await session.execute(stmt)
+    items = result.all()
     return paginate(items)

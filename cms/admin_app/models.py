@@ -37,6 +37,7 @@ class Photo(models.Model):
     )
     embeding = VectorField(dimensions=512, blank=False)
 
+    name = models.CharField(max_length=250, null=True, blank=False)
     height = models.IntegerField(null=True, blank=True)
     width = models.IntegerField(null=True, blank=True)
     extention = models.CharField(null=True, blank=True, max_length=10, verbose_name=_('photo_extension'))
