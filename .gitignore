@@ -1,0 +1,15 @@
+__pycache__/
+.mypy_cache
+.coverage
+htmlcov
+access.log
+error.log
+.vscode/
+.venv/
+.env
+data/
+.DS_Store
+backups/
+!backups/README.md
+bpe.model
+model_repo/

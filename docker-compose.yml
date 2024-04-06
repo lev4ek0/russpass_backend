@@ -1,0 +1,119 @@
+version: "3.8"
+
+services:
+  tritonserver:
+    image: nvcr.io/nvidia/tritonserver:23.08-py3
+    expose:
+      - 8000
+      - 8001
+      - 8002
+    volumes:
+      - ./model_repo:/models
+    command: tritonserver --model-repository=/models
+    networks:
+      - russpass-backend
+
+  cms_russpass:
+    container_name: cms_russpass
+    expose:
+      - 8010
+    build: ./cms
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - cms/.env
+    volumes:
+      - ./cms:/cms
+    restart: always
+    command: bash -c "
+      python3 manage.py makemigrations &&
+      python3 manage.py migrate &&
+      python3 manage.py collectstatic --noinput &&
+      python3 manage.py compilemessages &&
+      gunicorn -k uvicorn.workers.UvicornWorker --workers=${WORKERS} cms.asgi:application -b 0.0.0.0:8010"
+    networks:
+      - russpass-backend
+  
+  search_russpass:
+    container_name: search_russpass
+    expose:
+      - 8011
+    build: ./search
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - search/app/.env
+    restart: always
+    command: bash -c "
+      gunicorn -k uvicorn.workers.UvicornWorker --workers=${WORKERS} app.main:app -b 0.0.0.0:8011"
+    networks:
+      - russpass-backend
+
+  postgres:
+    image: ankane/pgvector
+    container_name: russpass-postgres
+    expose:
+      - 5432
+    ports:
+      - "5439:5432"
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql/data
+      - ./backups:/backups
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - pgadmin-network
+      - russpass-backend
+
+  # celery_worker:
+  #   build: ./cms
+  #   command: celery -A app.celery worker -l warning -Q main-queue -c ${WORKERS}
+  #   depends_on:
+  #     - redis
+  #   env_file:
+  #     - cms/.env
+  #   networks:
+  #     - russpass-backend
+
+  # celery-beat:
+  #   build: ./cms
+  #   command: celery -A app.celery beat -s /app/celerybeat-state -l warning
+  #   depends_on:
+  #     - redis
+  #   env_file:
+  #     - cms/.env
+  #   networks:
+  #     - russpass-backend
+
+  redis:
+    image: redis:7
+    restart: always
+    expose:
+      - 6379
+    env_file:
+      - cms/.env
+    networks:
+      - russpass-backend
+
+
+  nginx:
+    build: ./nginx
+    ports:
+      - '2222:80'
+    depends_on:
+      - cms_russpass
+      - search_russpass
+    volumes:
+      - ./cms/media:/app/media
+      - ./cms/static:/app/static
+    networks:
+      - russpass-backend
+  
+networks:
+  pgadmin-network:
+    name: pgadmin-network
+    external: true
+  russpass-backend:
