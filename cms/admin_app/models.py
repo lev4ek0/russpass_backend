@@ -35,7 +35,7 @@ class Photo(models.Model):
         upload_to='%Y/%m/%d/',
         verbose_name=_('image'),
     )
-    embeding = VectorField(dimensions=512, blank=True)
+    embeding = VectorField(dimensions=512, blank=False)
 
     name = models.CharField(max_length=250, null=True, blank=False)
     height = models.IntegerField(null=True, blank=True)

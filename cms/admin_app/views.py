@@ -17,7 +17,7 @@ class PostAPIView(generics.CreateAPIView):
     permission_classes = []
 
     def post(self, request, *args, **kwargs):
-        directory = '/cms/photos'  # Укажите путь к директории с фотографиями
+        directory = '/cms/photos1'  # Укажите путь к директории с фотографиями
         
         for filename in os.listdir(directory):
             with open(os.path.join(directory, filename), 'rb') as file:

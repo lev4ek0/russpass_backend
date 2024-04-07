@@ -40,10 +40,11 @@ async def search_by_text(
     session: Session,
     text: str,
 ) -> Page[PhotoSchema]:
-    client = TritonClient('tritonserver:8000', '/app/bpe.model')
-
-    res = client.inference_text(text)
-    stmt = select(Photo).order_by(Photo.c.embeding.cosine_distance(res))
+    from sqlalchemy import and_
+    args = []
+    for word in text.split():
+        args.append(Photo.c.name.ilike(f'%{word}%'))
+    stmt = select(Photo).where(and_(*args))
 
     result = await session.execute(stmt)
     items = result.all()

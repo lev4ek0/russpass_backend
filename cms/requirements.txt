@@ -10,6 +10,7 @@ pgsql==2.2
 wagtail==6.0.2
 pgvector==0.2.5
 wagtail-modeladmin==2.0.0
+django-jazzmin==2.6.1
 
 #triton
 aiohttp==3.9.3
