@@ -35,12 +35,15 @@ class Photo(models.Model):
         upload_to='%Y/%m/%d/',
         verbose_name=_('image'),
     )
-    embeding = VectorField(dimensions=512, blank=False)
+    embeding = VectorField(dimensions=512, blank=True)
 
     name = models.CharField(max_length=250, null=True, blank=False)
     height = models.IntegerField(null=True, blank=True)
     width = models.IntegerField(null=True, blank=True)
     extention = models.CharField(null=True, blank=True, max_length=10, verbose_name=_('photo_extension'))
+
+    distances = models.JSONField(null=True, blank=True)
+    images_of_closest_places = models.JSONField(null=True, blank=True)
 
     tags = models.ManyToManyField(Tag, related_name='photos', null=True, blank=True)
 
